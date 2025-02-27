@@ -15,3 +15,15 @@
 **【应用开发语言】：** Electron / HTML+CSS+JS
 
 **【应用版本】：** 1.1.2
+
+
+
+# 本地部署 / Setup In Local
+**下载、解压项目文件至工作区**
+`cd ham-radio-diary-main`
+
+**安装 npm 运行环境**
+`npm install`
+
+**运行 Electron 项目**
+`npm start`
