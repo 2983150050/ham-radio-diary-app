@@ -2,4 +2,7 @@
 **一个使用 Electron 开发的桌面端程序：业余无线电通联日志（桌面端）**
 
 应用效果图：
-![应用效果图：](https://ham.georgewu.xyz/hamradiodiary.png)
+![应用效果图：](https://ham.georgewu.xyz/HRD.jpg)
+
+#### 程序信息 / Information
+
