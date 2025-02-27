@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../georgewu.ico">
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./libs/font-awesome-4.7.0/css/font-awesome.min.css">
+    <title>HAM - 业余无线电通联日志</title>
+</head>
+<body>
+
+    <!--导航栏-->
+    <div class="header">
+        <header>
+          <div class="hd-left"><img src="../georgewu.ico"><p>CN_HAM</p></div>
+          <div class="hd-right"><p>业余无线电通联日志</p></div>
+        </header>
+    </div>
+
+    <!-- 标题 -->
+    <div class="addbox-title">
+        <div class="addinput-title">
+            <p>日期</p><p>时间</p><p>对方呼号</p><p>频率</p><p>通信模式</p><p>对方</p><p>双方</p>
+        </div>
+        <div class="addbutton-title">
+            <p>操作</p>
+        </div>
+    </div>
+    <!-- 输入框/按钮 -->
+    <div class="addbox">
+        <div class="addinput">
+            <input type="text" id="date" placeholder="日期" onclick="showCalendar(this)">
+            <input type="text" id="time" placeholder="时间">
+            <input type="text" id="toradio" placeholder="对方呼号">
+            <input type="text" id="frep" placeholder="频率">
+            <input type="text" id="mode" placeholder="通信模式">
+            <input type="text" id="call" placeholder="对方">
+            <input type="text" id="rst" placeholder="双方">
+        </div>
+        <div class="addbutton">
+            <button onclick="addLog()">记录</button>
+        </div>
+    </div>
+
+    <!-- 日历组件 -->
+    <div id="calendar" class="calendar"></div>
+
+    <!-- 列表 -->
+    <!-- 大标题 -->
+    <div class="addlist-title"><h1>列表</h1><button onclick="location.reload()">刷新</button></div>
+    <div class="addlist-main" id="logList">
+        <!-- 记录事件 -->
+    </div>
+
+    <!--底部版权信息-->
+    <footer>
+        <div class="ft-box"><p>©️2025 CopyRightBy CN_HAM</p></div>
+    </footer>
+
+    <!--关于-->
+    <div class="inf" title="关于">
+        <button onclick="alert('版本：1.1.2 / 项目所有人：伍发坚 GEORGEWU')">i</button>
+    </div>
+
+</body>
+<script>
+function addLog() {
+    // 获取输入框的值
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const toradio = document.getElementById('toradio').value;
+    const frep = document.getElementById('frep').value;
+    const mode = document.getElementById('mode').value;
+    const call = document.getElementById('call').value;
+    const rst = document.getElementById('rst').value;
+
+    // 检查所有输入框是否为空
+    if (!date && !time && !toradio && !frep && !mode && !call && !rst) {
+        // 如果所有输入框都为空，则不执行添加记录数据的操作
+        return;
+    }
+
+    // 创建唯一的ID
+    const logId = Date.now().toString();
+
+    // 创建新的记录容器
+    const logList = document.getElementById('logList');
+    const newLog = document.createElement('div');
+    newLog.className = 'addbox-list fadeInDown'; // 添加动画类
+    newLog.id = logId; // 设置ID
+
+    // 创建输入部分
+    const addInputList = document.createElement('div');
+    addInputList.className = 'addinput-list';
+    addInputList.innerHTML = `
+        <span>${date}</span>
+        <span>${time}</span>
+        <span class="toradio">${toradio}</span>
+        <span class="frep">${frep}</span>
+        <span>${mode}</span>
+        <span>${call}</span>
+        <span>${rst}</span>
+    `;
+
+    // 创建删除按钮部分
+    const delButton = document.createElement('div');
+    delButton.className = 'delbutton';
+    delButton.innerHTML = `<button onclick="deleteLog('${logId}')">删除</button>`;
+
+    // 将新记录添加到列表中
+    newLog.appendChild(addInputList);
+    newLog.appendChild(delButton);
+    logList.appendChild(newLog);
+
+    // 保存到localStorage
+    const logData = { date, time, toradio, frep, mode, call, rst };
+    let logs = JSON.parse(localStorage.getItem('logs')) || [];
+    logs.push({ id: logId, data: logData });
+    localStorage.setItem('logs', JSON.stringify(logs));
+
+    // 清空输入框
+    document.getElementById('date').value = '';
+    document.getElementById('time').value = '';
+    document.getElementById('toradio').value = '';
+    document.getElementById('frep').value = '';
+    document.getElementById('mode').value = '';
+    document.getElementById('call').value = '';
+    document.getElementById('rst').value = '';
+}
+
+function deleteLog(logId) {
+    // 从localStorage中删除记录
+    let logs = JSON.parse(localStorage.getItem('logs')) || [];
+    logs = logs.filter(log => log.id !== logId);
+    localStorage.setItem('logs', JSON.stringify(logs));
+
+    // 从页面中移除对应的DOM元素
+    const logElement = document.getElementById(logId);
+    if (logElement) {
+        logElement.remove();
+    }
+}
+
+function loadLogs() {
+    // 从localStorage中加载记录
+    const logList = document.getElementById('logList');
+    logList.innerHTML = ''; // 清空现有记录
+    let logs = JSON.parse(localStorage.getItem('logs')) || [];
+    logs.forEach(log => {
+        const { id, data } = log;
+        const { date, time, toradio, frep, mode, call, rst } = data;
+
+        // 创建新的记录容器
+        const newLog = document.createElement('div');
+        newLog.className = 'addbox-list';
+        newLog.id = id; // 设置ID
+
+        // 创建输入部分
+        const addInputList = document.createElement('div');
+        addInputList.className = 'addinput-list';
+        addInputList.innerHTML = `
+            <span>${date}</span>
+            <span>${time}</span>
+            <span class="toradio">${toradio}</span>
+            <span class="frep">${frep}</span>
+            <span>${mode}</span>
+            <span>${call}</span>
+            <span>${rst}</span>
+        `;
+
+        // 创建删除按钮部分
+        const delButton = document.createElement('div');
+        delButton.className = 'delbutton';
+        delButton.innerHTML = `<button onclick="deleteLog('${id}')">删除</button>`;
+
+        // 将新记录添加到列表中
+        newLog.appendChild(addInputList);
+        newLog.appendChild(delButton);
+        logList.appendChild(newLog);
+    });
+}
+
+// 页面加载时加载记录
+window.onload = loadLogs;
+
+// 显示日历
+function showCalendar(input) {
+    const calendar = document.getElementById('calendar');
+    calendar.style.display = 'block';
+    calendar.style.position = 'absolute';
+    calendar.style.top = `${input.offsetTop + input.offsetHeight}px`;
+    calendar.style.left = `${input.offsetLeft}px`;
+    generateCalendar(new Date(), calendar, input); // 传递 input 参数
+}
+
+// 生成日历
+function generateCalendar(date, calendar, input) { // 接收 input 参数
+    calendar.innerHTML = ''; // 清空日历内容
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const today = new Date(); // 获取当前日期
+    const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month; // 检查是否为当前月份
+
+    const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+
+    // 创建日历表头
+    const header = document.createElement('div');
+    header.className = 'calendar-header';
+    header.innerHTML = `<span>${monthNames[month]} ${year}</span>`;
+    calendar.appendChild(header);
+
+    // 创建日历主体
+    const body = document.createElement('div');
+    body.className = 'calendar-body';
+    const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+    daysOfWeek.forEach(day => {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = day;
+        body.appendChild(dayElement);
+    });
+
+    for (let i = 0; i < firstDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-empty';
+        body.appendChild(emptyDay);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-date';
+        dayElement.textContent = day;
+        if (isCurrentMonth && day === today.getDate()) {
+            dayElement.classList.add('today'); // 为当前日期添加 'today' 类
+        }
+        dayElement.onclick = () => {
+            input.value = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            calendar.style.display = 'none'; // 关闭日历组件
+        };
+        body.appendChild(dayElement);
+    }
+
+    calendar.appendChild(body);
+}
+
+// 添加点击事件监听器，用于关闭日历组件
+document.addEventListener('click', function(event) {
+    const calendar = document.getElementById('calendar');
+    const dateInput = document.getElementById('date');
+    if (calendar.style.display === 'block' && !calendar.contains(event.target) && event.target !== dateInput) {
+        calendar.style.display = 'none';
+    }
+});
+
+</script>
+</html>
